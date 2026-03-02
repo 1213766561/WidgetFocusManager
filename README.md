@@ -1,49 +1,45 @@
-Feature: WidgetFocusManager
-  为了提供可预测的键盘和编程焦点行为
-  作为 UI 框架
-  WidgetFocusManager 应一致且可访问地管理控件焦点
+# WidgetFocusManager
 
-  Background:
-    假设有多个受 WidgetFocusManager 管理的可聚焦控件
+## 概述
 
-  场景: 新控件创建时设置初始焦点
-    假设新控件 "A" 被添加到管理器
-    当控件请求初始焦点
-    那么 WidgetFocusManager 应将 "A" 标记为已聚焦
-    并且聚焦控件应发出 "focusGained" 事件
+WidgetFocusManager 提供了一组用于管理 UI 中键盘与程序化焦点行为的规范与测试场景。本文件夹包含以 Gherkin 编写的 feature 文件，描述预期的焦点行为，包括：
 
-  场景: 使用 Tab 向前移动焦点
-    假设控件 "A", "B", "C" 按 Tab 顺序可聚焦
-    且当前 "A" 处于聚焦状态
-    当用户按下 "Tab"
-    那么焦点应移动到 "B"
-    并为 "A" 发送 "focusLost" 事件，为 "B" 发送 "focusGained" 事件
+- Tab 顺序导航
+- 程序化聚焦
+- 模态焦点捕获
+- 移除后焦点恢复
+- 无障碍通知
 
-  场景: 使用 Shift+Tab 向后移动焦点
-    假设控件 "A", "B", "C" 按 Tab 顺序可聚焦
-    且当前 "C" 处于聚焦状态
-    当用户按下 "Shift+Tab"
-    那么焦点应移动到 "B"
+## 文件
 
-  场景: 程序化焦点切换
-    假设存在控件 "A" 和 "B"
-    当应用调用 focus("B")
-    那么 "B" 应立即获得焦点
+- `WidgetFocusManager.en.feature` — WidgetFocusManager 的英文 Gherkin 场景文件
+- `WidgetFocusManager.zh.feature` — WidgetFocusManager 的中文 Gherkin 场景文件
 
-  场景: 模态对话框捕获焦点
-    假设模态控件 "Modal" 打开并标记为模态
-    且模态内有可聚焦控件 "M1", "M2"
-    当 "Modal" 为活动状态
-    那么 Tab 与 Shift+Tab 应仅在 "M1" 和 "M2" 之间循环
-    并且焦点不应移出模态范围
+## 目标
 
-  场景: 控件移除后的焦点恢复
-    假设 "B" 当前被聚焦且控件 "B" 被移除
-    当移除完成后
-    那么焦点应移动到按 Tab 顺序的最近可聚焦控件
-    或在无可用控件时清除焦点
+- 为焦点处理定义清晰、可测试的行为
+- 支持键盘导航（`Tab` / `Shift+Tab`）与程序化焦点变更
+- 确保模态对话框在激活时捕获焦点
+- 在控件被移除时恢复或清除焦点
+- 在焦点变化时提供 `focus-visible` 状态并通知无障碍 API
 
-  场景: 焦点可见性与无障碍通知
-    假设控件通过键盘获得焦点
-    那么 WidgetFocusManager 应为该控件设置焦点可见状态
-    并通过无障碍接口通知焦点变化
+## 使用方法
+
+1. 将 `.feature` 文件作为实现或测试焦点管理器的规范。
+2. 将 `.feature` 文件导入 BDD/测试框架（如 Cucumber、SpecFlow），并实现对应的 step definitions 来驱动 UI 或 `WidgetFocusManager` 的实现。
+
+## 实现要点
+
+- 焦点顺序应遵循确定性的 Tab 顺序；组件需能够声明自己是否可聚焦。
+- 通过键盘获得的焦点应设置 `focus-visible` 状态，以便样式显示键盘焦点。
+- 模态容器应在激活时限制 `Tab` / `Shift+Tab` 在其可聚焦子项之间循环。
+- 当被聚焦的控件被移除时，应将焦点移动到下一个合理的控件，或在无可用控件时清除焦点。
+- 发出明确的焦点事件（`focusGained` / `focusLost`），并与无障碍接口集成。
+
+## 贡献
+
+如新增场景或功能，请同时更新英文与中文的 feature 文件及此 README，且保持场景简洁明确。
+
+## 许可
+
+请遵循仓库中定义的许可协议；若仓库无许可，请在复用前联系项目负责人。

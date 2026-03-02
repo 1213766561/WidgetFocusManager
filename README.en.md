@@ -1,50 +1,45 @@
-Feature: WidgetFocusManager
-  In order to provide predictable keyboard and programmatic focus behavior
-  As a UI framework
-  The WidgetFocusManager should manage focus for widgets consistently and accessibly
+# WidgetFocusManager
 
-  Background:
-    Given a UI with multiple focusable widgets managed by WidgetFocusManager
+## Overview
 
-  Scenario: Set initial focus when a widget is created
-    Given a new widget "A" is added to the manager
-    When the widget requests initial focus
-    Then WidgetFocusManager should mark "A" as focused
-    And the focused widget should emit a "focusGained" event
+WidgetFocusManager provides rules and test scenarios for managing keyboard and programmatic focus in a UI. This folder contains Gherkin feature files that describe expected focus behavior, including:
 
-  Scenario: Move focus forward with Tab
-    Given widgets "A", "B", "C" are focusable in tab order
-    And "A" is currently focused
-    When the user presses "Tab"
-    Then focus should move to "B"
-    And a "focusLost" event should be emitted for "A"
-    And a "focusGained" event should be emitted for "B"
+- Tab order navigation
+- Programmatic focus
+- Modal focus trapping
+- Focus restoration
+- Accessibility notifications
 
-  Scenario: Move focus backward with Shift+Tab
-    Given widgets "A", "B", "C" are focusable in tab order
-    And "C" is currently focused
-    When the user presses "Shift+Tab"
-    Then focus should move to "B"
+## Files
 
-  Scenario: Programmatic focus change
-    Given widgets "A" and "B" exist
-    When the application calls focus("B")
-    Then "B" should become focused immediately
+- `WidgetFocusManager.en.feature` — English Gherkin feature scenarios for WidgetFocusManager
+- `WidgetFocusManager.zh.feature` — Chinese Gherkin feature scenarios for WidgetFocusManager
 
-  Scenario: Modal dialog traps focus
-    Given a modal widget "Modal" is opened and marked as modal
-    And modal contains focusable widgets "M1", "M2"
-    When "Modal" is active
-    Then Tab and Shift+Tab should cycle focus only between "M1" and "M2"
-    And focus should not move to widgets outside the modal
+## Goals
 
-  Scenario: Focus restoration after widget removal
-    Given "B" is focused and widget "B" is removed
-    When removal completes
-    Then focus should move to the nearest focusable widget according to tab order
-    Or WidgetFocusManager should clear focus if none available
+- Define clear, testable behavior for focus handling
+- Support keyboard navigation (`Tab` / `Shift+Tab`) and programmatic focus changes
+- Ensure modal dialogs trap focus while active
+- Restore or clear focus when widgets are removed
+- Provide `focus-visible` state and notify accessibility APIs on focus changes
 
-  Scenario: Focus-visible and accessibility notifications
-    Given a widget becomes focused via keyboard
-    Then WidgetFocusManager should set a focus-visible state for that widget
-    And accessibility APIs should be notified of focus changes
+## Usage
+
+1. Use the `.feature` files as the specification for implementing or testing a focus manager.
+2. Import the `.feature` files into your BDD/test runner (e.g., Cucumber, SpecFlow) and implement step definitions that exercise the UI or the `WidgetFocusManager` implementation.
+
+## Implementation notes
+
+- Focus order should follow a deterministic tab order; components must expose whether they are focusable.
+- Keyboard-originated focus should set a `focus-visible` state so styles can show keyboard focus.
+- Modal containers should restrict `Tab` / `Shift+Tab` to their focusable descendants while active.
+- When a focused widget is removed, move focus to the next logical widget or clear it if none exist.
+- Emit explicit focus events (`focusGained` / `focusLost`) and integrate with accessibility APIs.
+
+## Contributing
+
+If you add features or scenarios, update both the English and Chinese feature files and this README. Keep scenarios small and focused.
+
+## License
+
+Follow the repository's license. If none exists, consult the project owner before reuse.
